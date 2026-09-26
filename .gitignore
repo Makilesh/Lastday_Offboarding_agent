@@ -1,1 +1,14 @@
-.venv/*
+# Secrets
+.env
+
+# Plans and journals written at runtime
+.lastday/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local tooling
+.remember/
