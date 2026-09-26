@@ -35,7 +35,7 @@ def test_only_tagged_unarchived_repos_are_in_scope():
 
 @pytest.mark.parametrize("name", ["untagged", "archived", "missing"])
 def test_out_of_scope_repo_is_refused(name):
-    with pytest.raises(ScopeError, match="out of scope"):
+    with pytest.raises(ScopeError, match="out of scope.*In-scope repositories: tagged\\.$"):
         scope().require_repo(name)
 
 

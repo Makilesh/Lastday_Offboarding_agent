@@ -234,8 +234,3 @@ TrueForge:
 uv run scripts/run_code_mode.py path/to/script.py
 ```
 
-## AI tools used
-
-Built with [Claude Code](https://claude.com/claude-code) as a pair programmer: design
-review, implementation, tests and this README, with every change reviewed and run against
-the real organization by the author.

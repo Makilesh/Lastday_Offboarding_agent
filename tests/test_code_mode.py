@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 from mcp import Client
 
-from lastday.codemode import ToolCallError, install
+from lastday.codemode import install
 from lastday.server import build_server
 from lastday.store import PlanStore
 from tests.fake_org import ORG, REPO, fake_org, scope_for
@@ -63,5 +63,5 @@ def test_scan_script_finds_codeowner_and_actor_gated_workflow(connected, capsys)
 def test_tool_errors_reach_the_script_as_exceptions(connected):
     from mcp_client import call_tool
 
-    with pytest.raises(ToolCallError, match="out of scope"):
-        asyncio.run(call_tool("lastday", "get_repo_snapshot", body={"repo": "private"}))
+    with pytest.raises(RuntimeError, match=r"^MCP tool error \(server=lastday, tool=get_repo_snapshot\): .*out of scope"):
+        asyncio.run(call_tool("lastday", "get_repo_snapshot", {"repo": "private"}))
