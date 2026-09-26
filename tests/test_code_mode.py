@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 from mcp import Client
 
-from lastday.codemode import ToolCallError, install
+from lastday.codemode import install
 from lastday.server import build_server
 from lastday.store import PlanStore
 from tests.fake_org import ORG, REPO, fake_org, scope_for
