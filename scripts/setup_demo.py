@@ -83,7 +83,8 @@ def ensure_member_in_org(run: Runner, gh: GitHub, org: str, reset: bool) -> None
             gh.post(f"/orgs/{org}/invitations", {"invitee_id": user_id, "role": "direct_member"})
         GitHub(require_env("FATBATMAN_TOKEN")).patch(f"/user/memberships/orgs/{org}", {"state": "active"})
 
-    run.ensure(active, f"{MEMBER} is a member of {org} (invite, then accept as {MEMBER})", invite_and_accept)
+    how = "" if active else f" (invite, then accept as {MEMBER})"
+    run.ensure(active, f"{MEMBER} is a member of {org}{how}", invite_and_accept)
 
 
 def ensure_topic(run: Runner, gh: GitHub, full_repo: str) -> None:
