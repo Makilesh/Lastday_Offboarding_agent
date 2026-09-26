@@ -133,7 +133,8 @@ class Handover:
         after = self._direct_role(full_repo)
         if after in ELEVATED_ROLES:
             raise HandoverError(f"asked GitHub to downgrade {self.member} on {repo}, but they still have {after}")
-        return f"downgraded {self.member}'s direct access to {repo} from {role} to {after}"
+        # GitHub reports the effective role, which may still include access through a team.
+        return f"set {self.member}'s direct access to {repo} to read (was {role})"
 
     def _direct_role(self, full_repo: str) -> str | None:
         for user in self.gh.paginate(f"/repos/{full_repo}/collaborators", affiliation="direct"):
