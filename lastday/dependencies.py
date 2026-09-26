@@ -62,11 +62,10 @@ def find_dependencies(gh: GitHub, scope: Scope, member: str) -> list[Dependency]
         for file in config_files(gh, full_repo, repo["default_branch"]):
             found += file_dependencies(name, file["path"], file["text"], member)
         for user in gh.paginate(f"/repos/{full_repo}/collaborators", affiliation="direct"):
-            if user["login"].lower() == member.lower():
-                role = user["role_name"]
-                found.append(
-                    Dependency("direct_access", name, "collaborators", f"direct {role} access", role in ELEVATED_ROLES)
-                )
+            # Lesser direct access ends with the membership, so only elevated roles are reported.
+            if user["login"].lower() == member.lower() and user["role_name"] in ELEVATED_ROLES:
+                detail = f"direct {user['role_name']} access"
+                found.append(Dependency("direct_access", name, "collaborators", detail, blocking=True))
         for pr in gh.paginate(f"/repos/{full_repo}/pulls", state="open"):
             if pr["user"]["login"].lower() == member.lower():
                 detail = f"open, needs a new owner: '{pr['title']}' {pr['html_url']}"
