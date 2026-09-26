@@ -74,6 +74,13 @@ def test_unexpected_response_body_is_shown_with_the_token_redacted():
     assert SECRET not in message
 
 
+def test_blocked_loopback_url_prints_the_fix():
+    fake = FakeTrueForge({("PUT", "/api/v1/settings/mcp-servers"): (400, '{"error":{"message":"Outbound URL blocked"}}')})
+    with pytest.raises(register_agent.TrueForgeError) as error:
+        fake.client().data("PUT", "/api/v1/settings/mcp-servers", {})
+    assert "OUTBOUND_URL_ALLOWED_HOSTS = '[\"127.0.0.1\"]'" in str(error.value)
+
+
 def test_json_without_data_field_is_shown():
     fake = FakeTrueForge({("GET", "/api/v1/agents"): (200, {"agents": []})})
     with pytest.raises(register_agent.TrueForgeError, match="without a 'data' field:\n{'agents': \\[\\]}"):
