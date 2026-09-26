@@ -34,11 +34,14 @@ class Scope:
         ]
 
     def require_repo(self, name: str) -> dict:
-        for repo in self.repos():
+        repos = self.repos()
+        for repo in repos:
             if repo["name"] == name:
                 return repo
+        in_scope = ", ".join(repo["name"] for repo in repos) or "none"
         raise ScopeError(
-            f"{self.org}/{name} is out of scope: Last Day only works on repositories tagged {SCOPE_TOPIC}."
+            f"{self.org}/{name} is out of scope: Last Day only works on repositories tagged {SCOPE_TOPIC}. "
+            f"In-scope repositories: {in_scope}."
         )
 
     def require_departing_member(self, login: str) -> dict:
