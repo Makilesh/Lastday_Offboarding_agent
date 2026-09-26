@@ -27,11 +27,14 @@ For a full offboarding, work in this order.
    The script must:
    - call `list_scoped_repos` (it returns `{"org", "topic", "repos": [{"name", ...}]}`), then
      `get_repo_snapshot` for every entry of `repos` in parallel: `asyncio.gather` over
-     `call_tool("lastday", "get_repo_snapshot", {"repo": repo["name"]})`; `call_tool` returns
+     `call_tool("lastday", "get_repo_snapshot", {"repo": repo["name"]})`; `call_tool` always
+     takes the arguments dict as its third argument (`{}` when there are none) and returns
      the tool's result as a dict;
-   - on every line of every entry in `files` that does not start with `#`, look for the member
-     as a whole login, with or without `@`, in any case, using exactly this pattern with
-     `re.IGNORECASE`: `"(?<![A-Za-z0-9-])@?" + re.escape(member) + "(?![A-Za-z0-9-])"`;
+   - check each line separately, never whole files (files often start with a comment):
+     `for number, line in enumerate(file["text"].splitlines(), start=1)`, skip the line if
+     `line.strip().startswith("#")`, otherwise look for the member as a whole login, with or
+     without `@`, in any case, using exactly this pattern with `re.IGNORECASE`:
+     `"(?<![A-Za-z0-9-])@?" + re.escape(member) + "(?![A-Za-z0-9-])"`;
      a match in the file named by `active_codeowners_path` is a code-ownership dependency,
      any other match (for example `github.actor == '<member>'` in a workflow) is a file
      reference;

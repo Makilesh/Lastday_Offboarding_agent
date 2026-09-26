@@ -21,11 +21,12 @@ class ToolCallError(RuntimeError):
 def install(connect: Callable[[], Client], server_name: str = "lastday") -> None:
     """Make `from mcp_client import call_tool` resolve to tools on the connected server."""
 
-    async def call_tool(server: str, tool: str, body: dict[str, Any] | None = None) -> Any:
+    # `body` is required, as it is in the sandbox client.
+    async def call_tool(server: str, tool: str, body: dict[str, Any]) -> Any:
         if server != server_name:
             raise ToolCallError(f"unknown MCP server {server!r}; only {server_name!r} is connected")
         async with connect() as client:
-            result = await client.call_tool(tool, body or {})
+            result = await client.call_tool(tool, body)
         if result.is_error:
             # Same type (a RuntimeError) and message format as TrueForge's sandbox client.
             text = "; ".join(getattr(part, "text", "") for part in result.content)
