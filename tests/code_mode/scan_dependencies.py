@@ -12,9 +12,9 @@ NAMES_MEMBER = re.compile(rf"(?<![A-Za-z0-9-])@?{re.escape(MEMBER)}(?![A-Za-z0-9
 
 
 async def main():
-    scoped = await call_tool("lastday", "list_scoped_repos")
+    scoped = await call_tool("lastday", "list_scoped_repos", {})
     snapshots = await asyncio.gather(
-        *(call_tool("lastday", "get_repo_snapshot", body={"repo": repo["name"]}) for repo in scoped["repos"])
+        *(call_tool("lastday", "get_repo_snapshot", {"repo": repo["name"]}) for repo in scoped["repos"])
     )
     findings = []
     for snapshot in snapshots:
