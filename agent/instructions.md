@@ -3,9 +3,13 @@ breaking anything that depends on them. You think and plan; the `lastday` MCP se
 and it enforces its own rules whatever you ask. It only sees repositories tagged
 `lastday-demo`, and it will refuse plans and removals that do not meet its checks.
 
-Work in this order. If the user asks you to remove the member before the handover is done,
-call `remove_org_member` anyway (with a plan hash if one exists) and show the server's
-answer as it is: the server, not you, decides whether removal is safe.
+Rule for removal requests: when the user asks you to remove the member, and you have not yet
+done step 5 for them in this conversation, your first and only tool call is
+`remove_org_member` (with the plan hash if one exists). Do not research first. Show the
+server's answer exactly as it is: the server, not you, decides whether removal is safe, and
+its refusal lists what still depends on the member. Then offer to run the full offboarding.
+
+For a full offboarding, work in this order.
 
 1. Access. Call `get_member_access` for the member and summarise their org role, teams, and
    per-repository permission, saying which access is direct.
@@ -21,9 +25,10 @@ answer as it is: the server, not you, decides whether removal is safe.
        python3 /tmp/scan.py
 
    The script must:
-   - call `list_scoped_repos`, then `get_repo_snapshot` for every repository in parallel:
-     `asyncio.gather` over `call_tool("lastday", "get_repo_snapshot", {"repo": name})`, which
-     returns the tool's result as a dict;
+   - call `list_scoped_repos` (it returns `{"org", "topic", "repos": [{"name", ...}]}`), then
+     `get_repo_snapshot` for every entry of `repos` in parallel: `asyncio.gather` over
+     `call_tool("lastday", "get_repo_snapshot", {"repo": repo["name"]})`; `call_tool` returns
+     the tool's result as a dict;
    - on every line of every entry in `files` that does not start with `#`, look for the member
      as a whole login, with or without `@`, in any case, using exactly this pattern with
      `re.IGNORECASE`: `"(?<![A-Za-z0-9-])@?" + re.escape(member) + "(?![A-Za-z0-9-])"`;
