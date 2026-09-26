@@ -6,10 +6,12 @@ from typing import Any
 
 import httpx
 
+from lastday.errors import LastDayError
+
 API_URL = "https://api.github.com"
 
 
-class GitHubError(RuntimeError):
+class GitHubError(LastDayError):
     def __init__(self, method: str, path: str, status: int, message: str):
         self.status = status
         hint = ""

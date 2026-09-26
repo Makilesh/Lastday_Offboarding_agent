@@ -5,8 +5,12 @@ description = "Offboard a GitHub org member without silently breaking what depen
 requires-python = ">=3.11"
 dependencies = [
     "httpx>=0.27",
+    "mcp>=2.2,<3",
     "python-dotenv>=1.0",
 ]
+
+[project.scripts]
+lastday-server = "lastday.server:main"
 
 [dependency-groups]
 dev = ["pytest>=8"]
