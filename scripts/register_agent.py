@@ -23,6 +23,10 @@ AGENT_NAME = "last-day"
 INSTRUCTIONS_PATH = Path(__file__).resolve().parent.parent / "agent" / "instructions.md"
 # Named explicitly: the default @destructive selector only matches annotated tools.
 GATED_TOOLS = ["apply_reversible_steps", "remove_org_member"]
+OUTBOUND_BLOCKED_FIX = """\
+Fix: TrueForge refuses loopback MCP URLs by default. Restart it with the MCP server's host allowed:
+  PowerShell: $env:OUTBOUND_URL_ALLOWED_HOSTS = '["127.0.0.1"]'; npx @truefoundry/trueforge@latest
+  bash:       OUTBOUND_URL_ALLOWED_HOSTS='["127.0.0.1"]' npx @truefoundry/trueforge@latest"""
 DESCRIPTION = "Offboards a GitHub org member: finds what depends on them, hands it over, then asks before removal."
 
 
@@ -56,9 +60,10 @@ class TrueForge:
         return payload["data"]
 
     def unexpected(self, method: str, path: str, response: httpx.Response, what: str) -> TrueForgeError:
+        hint = f"\n\n{OUTBOUND_BLOCKED_FIX}" if "outbound url blocked" in response.text.lower() else ""
         return TrueForgeError(
             f"TrueForge {method} {path} returned {what} ({response.status_code}). Response body:\n"
-            f"{self.redact(response.text)[:4000]}"
+            f"{self.redact(response.text)[:4000]}{hint}"
         )
 
     def redact(self, text: str) -> str:
