@@ -27,7 +27,9 @@ def install(connect: Callable[[], Client], server_name: str = "lastday") -> None
         async with connect() as client:
             result = await client.call_tool(tool, body or {})
         if result.is_error:
-            raise ToolCallError("; ".join(getattr(part, "text", "") for part in result.content))
+            # Same type (a RuntimeError) and message format as TrueForge's sandbox client.
+            text = "; ".join(getattr(part, "text", "") for part in result.content)
+            raise ToolCallError(f"MCP tool error (server={server}, tool={tool}): {text}")
         return result.structured_content
 
     module = types.ModuleType("mcp_client")
