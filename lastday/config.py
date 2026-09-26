@@ -4,11 +4,13 @@ import os
 
 from dotenv import load_dotenv
 
+from lastday.errors import LastDayError
+
 # Only repositories carrying this topic are ever read or changed.
 SCOPE_TOPIC = "lastday-demo"
 
 
-class ConfigError(RuntimeError):
+class ConfigError(LastDayError):
     pass
 
 
