@@ -78,10 +78,17 @@ def ensure_member_in_org(run: Runner, gh: GitHub, org: str, reset: bool) -> None
         raise SystemExit(f"{MEMBER} is not an active member of {org}. Re-run with --reset.")
 
     def invite_and_accept() -> None:
+        member_gh = GitHub(require_env("FATBATMAN_TOKEN"))
+        owner = member_gh.get("/user")["login"]
+        if owner.lower() != MEMBER.lower():
+            raise SystemExit(f"FATBATMAN_TOKEN belongs to {owner}, not {MEMBER}; it cannot accept {MEMBER}'s invite.")
         if membership is None:
             user_id = gh.get(f"/users/{MEMBER}")["id"]
             gh.post(f"/orgs/{org}/invitations", {"invitee_id": user_id, "role": "direct_member"})
-        GitHub(require_env("FATBATMAN_TOKEN")).patch(f"/user/memberships/orgs/{org}", {"state": "active"})
+        member_gh.patch(f"/user/memberships/orgs/{org}", {"state": "active"})
+        after = gh.get_or_none(f"/orgs/{org}/memberships/{MEMBER}")
+        if not after or after["state"] != "active":
+            raise SystemExit(f"accepted the invite as {MEMBER}, but {org} still shows them as not active.")
 
     how = "" if active else f" (invite, then accept as {MEMBER})"
     run.ensure(active, f"{MEMBER} is a member of {org}{how}", invite_and_accept)
