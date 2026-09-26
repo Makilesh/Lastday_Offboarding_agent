@@ -64,9 +64,10 @@ def build_server(gh: GitHub, scope: Scope) -> MCPServer:
     @server.tool(annotations=READ_ONLY)
     @honest_errors
     def get_repo_snapshot(repo: str) -> dict:
-        """Return one in-scope repository's CODEOWNERS file, workflow files, branch protection,
-        direct collaborators, team access and open pull requests, all from the default branch.
-        `repo` is the repository name without the org."""
+        """Return one in-scope repository as of its default branch: the text of every CODEOWNERS
+        file and every file under .github/ (`files`, with the CODEOWNERS file GitHub uses named in
+        `active_codeowners_path`), branch protection, direct collaborators, team access and open
+        pull requests. `repo` is the repository name without the org."""
         return inventory.repo_snapshot(gh, scope, repo)
 
     return server
