@@ -24,6 +24,7 @@ from lastday import actions, inventory
 from lastday.config import SCOPE_TOPIC, require_env
 from lastday.errors import LastDayError
 from lastday.github import GitHub
+from lastday.schemas import MemberAccess, RepoSnapshot, ScopedRepos
 from lastday.scope import Scope
 from lastday.store import PlanStore
 
@@ -53,25 +54,25 @@ def build_server(gh: GitHub, scope: Scope, store: PlanStore) -> MCPServer:
 
     @server.tool(annotations=READ_ONLY)
     @honest_errors
-    def list_scoped_repos() -> dict:
+    def list_scoped_repos() -> ScopedRepos:
         """List the repositories Last Day may read or change (tagged with the scope topic)."""
-        return {"org": scope.org, "topic": SCOPE_TOPIC, "repos": scope.repos()}
+        return ScopedRepos(org=scope.org, topic=SCOPE_TOPIC, repos=scope.repos())
 
     @server.tool(annotations=READ_ONLY)
     @honest_errors
-    def get_member_access(member: str) -> dict:
+    def get_member_access(member: str) -> MemberAccess:
         """Show how a member can reach the org: org role, team memberships, their permission and
         direct role on each in-scope repository, and their open pull requests."""
-        return inventory.member_access(gh, scope, member)
+        return MemberAccess.model_validate(inventory.member_access(gh, scope, member))
 
     @server.tool(annotations=READ_ONLY)
     @honest_errors
-    def get_repo_snapshot(repo: str) -> dict:
+    def get_repo_snapshot(repo: str) -> RepoSnapshot:
         """Return one in-scope repository as of its default branch: the text of every CODEOWNERS
         file and every file under .github/ (`files`, with the CODEOWNERS file GitHub uses named in
         `active_codeowners_path`), branch protection, direct collaborators, team access and open
         pull requests. `repo` is the repository name without the org."""
-        return inventory.repo_snapshot(gh, scope, repo)
+        return RepoSnapshot.model_validate(inventory.repo_snapshot(gh, scope, repo))
 
     @server.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True))
     @honest_errors

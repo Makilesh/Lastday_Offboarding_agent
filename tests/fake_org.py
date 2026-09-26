@@ -47,6 +47,7 @@ def fake_org(handed_over: bool = False) -> FakeGitHub:
             f"/repos/{ORG}/{REPO}/pulls",
             [{"number": 7, "user": {"login": MEMBER}, "title": "Half-done feature", "html_url": "https://pr/7"}],
         )
+        .on("GET", f"/repos/{ORG}/{REPO}/teams", [{"slug": "core", "permission": "push" if handed_over else "pull"}])
         .on("GET", f"/orgs/{ORG}/teams", [{"slug": "core"}])
         .on("GET", f"/orgs/{ORG}/teams/core", {"slug": "core", "privacy": "closed"})
         .on("GET", f"/orgs/{ORG}/teams/core/members", [{"login": MEMBER}, {"login": OPERATOR}])
