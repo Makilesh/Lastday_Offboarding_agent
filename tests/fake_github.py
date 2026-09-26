@@ -13,6 +13,7 @@ class FakeGitHub:
         self.calls: list[tuple[str, str]] = []
 
     def on(self, method: str, path: str, body: object = None, status: int = 200) -> "FakeGitHub":
+        """Serve `body` for this route; a callable body returns (status, body) at request time."""
         self.routes[(method, path)] = (status, body)
         return self
 
@@ -26,6 +27,8 @@ class FakeGitHub:
         key = (request.method, request.url.path)
         self.calls.append(key)
         status, body = self.routes.get(key, (404, {"message": "Not Found"}))
+        if callable(body):
+            status, body = body()
         if status == 204:
             return httpx.Response(204)
         return httpx.Response(status, content=json.dumps(body))
