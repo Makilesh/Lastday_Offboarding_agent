@@ -111,7 +111,7 @@ These rules are code in the MCP server, not instructions to the model:
 can do is change files and access in the two tagged repositories through merged pull
 requests (each one reviewable and revertable) and remove the one planned member, only
 after their handover is complete. The MCP server only accepts requests carrying its bearer
-token, and only listens on `127.0.0.1`.
+token, and listens on `127.0.0.1` unless `LASTDAY_HOST` says otherwise.
 
 **What it does not cover:** it reads `CODEOWNERS` files and everything under `.github/`, not
 application code, secrets, deploy keys or installed apps. Merging the handover pull
